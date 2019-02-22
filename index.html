@@ -476,10 +476,45 @@ dialog::backdrop {
 		</div>
 </div>
 <dialog id="renamedialog" style="border-radius:8px;top:45%;border:1px solid #000;box-shadow: 0 3px 7px rgba(0, 0, 0, 0.5);">Rename Node : <br/><input id="renametext" spellcheck="false"/><br/><button id="renamecancel" style="width:60px">cancel</button><button id="renameok" style="width:60px"> OK </button></dialog>
+ <script>
+    const copyToClipboard = e => {
+      
+      var jsfile= document.querySelector('#jsfile');
+      jsfile.select();
+      var range = document.createRange();
+      range.selectNode(jsfile);
+      window.getSelection().addRange(range);
+
+      try {
+        // Now that we've selected the anchor text, execute the copy command
+        var successful = document.execCommand('copy');
+        var msg = successful ? 'successful' : 'unsuccessful';
+        console.log('Copy command was ' + msg);
+        let cpyMsgEl = document.querySelector('#cpy-msg');
+        if(successful){
+         cpyMsgEl.innerHTML = "<font color='lime'>COPY SUCCESS</font>";
+        }else{
+         cpyMsgEl.innerHTML = "<font color='red'>COPY FAIL</font>";
+        }
+        setTimeout(e=>{
+          cpyMsgEl.innerHTML = "";
+         },4000);
+      } catch(err) {
+        console.log('Oops, unable to copy');
+      }
+
+      // Remove the selections - NOTE: Should use
+      // removeRange(range) when it is supported
+      window.getSelection().removeAllRanges();
+         
+    }
+  </script>
 <div id="jspane">
+  <button id="cpy-cb" onclick="copyToClipboard()">Copy to clipboard</button>
 	<button class="panebutton1" id="jsclose">Close</button>
 	<a class="panebutton2" id="jsdownload" style="color:#fff">Download</a>
 	<div id="files"></div>
+  <div id="cpy-msg"></div>
 	<textarea id="jsfile" spellcheck="false"></textarea>
 </div>
 <div id="urlpane">

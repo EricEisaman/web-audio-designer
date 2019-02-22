@@ -1,11 +1,10 @@
 WebAudioDesigner
 ================
-
-WebAudioAPI GUI design tool
+## Edited version of Aleksey Vaneev's wonderful project
 
 ![](images/webaudiodesigner.png)
 
-Available at :
+The original version can be found at:
 [https://g200kg.github.io/WebAudioDesigner](https://g200kg.github.io/WebAudioDesigner)
 
 ## Usage
