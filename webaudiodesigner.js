@@ -721,9 +721,8 @@ function ExportJs(wadobj){
 	js+="}\n";
 
 	js+="window.addEventListener('load',function(){audioengine=new WebAudioEngine()});\n";
-	js+=`</script>\n<button onclick="audioengine.rebuild();audioengine.start()">Play</button> `;
-	js+=`<button onclick="audioengine.stop()">Stop</button><br/>\n`;
-  js+=`<button onclick="window.location.assign('/')">Return to Web Audio Designer</button><br/>`;
+	js+=`</script>\n<div style="margin-top:100px"><button onclick="audioengine.rebuild();audioengine.start()">Play</button> `;
+	js+=`<button onclick="audioengine.stop()">Stop</button><br/></div>\n`;
 //	js+="window.addEventListener('load',function(){wadengine=new WADEngine(waddata)});\n";
 //	js+="</script>\n<button onclick='wadengine.start()'>Start</button><br/>\n";
 	for(var i=0;i<obj.length;++i){
@@ -2850,9 +2849,9 @@ function MenuClick(e){
 	case "playbtn":
 		Play();
 		return;
-  case "sandbox":
-		location.assign("sandbox.html")
-		break;
+  case "modal_1_lnk":
+    e.target.parentElement.style.display="none";
+		return;
 	case "menunodebtn":
 		var node=document.getElementById("menunode");
 		var c=node.style.display;
