@@ -19,7 +19,7 @@
 //  note that osc/bufsrc will be recreated after rebuild()
 
 function WebAudioEngine(audioctx,destination){
-  this.waddata = [{n:"destination",x:568,y:86,mode:0,ver:1,W:800,H:600},{n:"osc2",x:384,y:164,c:["destination"]},{n:"gai1",x:200,y:300,p:{gain:1000},c:["osc2.detune"]},{n:"osc1",x:49,y:150,p:{frequency:2},c:["gai1"]}];
+  this.waddata = [{n:"destination",x:930,y:182,mode:0,ver:1,W:800,H:600},{n:"osc2",x:384,y:164,c:["destination","ana1"]},{n:"gai1",x:244,y:108,p:{gain:1000},c:["osc2.detune"]},{n:"osc1",x:49,y:150,p:{frequency:2},c:["gai1"]},{n:"ana1",x:624,y:258,p:{anabtn:0}}];
 
   this.audioctx = audioctx;
   this.nodes = {};
@@ -40,7 +40,9 @@ function WebAudioEngine(audioctx,destination){
     this.nodes.gai1.gain.value = 1000;
     this.nodes.osc1 = this.audioctx.createOscillator();
     this.nodes.osc1.frequency.value = 2;
+    this.nodes.ana1 = this.audioctx.createAnalyser();
     this.nodes.osc2.connect(this.nodes.destination);
+    this.nodes.osc2.connect(this.nodes.ana1);
     this.nodes.gai1.connect(this.nodes.osc2.detune);
     this.nodes.osc1.connect(this.nodes.gai1);
   };
@@ -121,6 +123,6 @@ function WebAudioEngine(audioctx,destination){
 }
 window.addEventListener('load',function(){audioengine=new WebAudioEngine()});
 </script>
-<button onclick="audioengine.rebuild();audioengine.start()">Play</button> <button onclick="audioengine.stop()">Stop</button><br/>
-<button onclick="window.location.assign('/')">Return to Web Audio Designer</button><br/></body>
+<div style="margin-top:100px"><button onclick="audioengine.rebuild();audioengine.start()">Play</button> <button onclick="audioengine.stop()">Stop</button><br/></div>
+</body>
 </html>
