@@ -19,8 +19,40 @@
 //  note that osc/bufsrc will be recreated after rebuild()
 
 function WebAudioEngine(audioctx,destination){
-  this.waddata = [{n:"destination",x:930,y:182,mode:0,ver:1,W:800,H:600},{n:"osc2",x:384,y:164,c:["destination","ana1"]},{n:"gai1",x:244,y:108,p:{gain:1000},c:["osc2.detune"]},{n:"osc1",x:49,y:150,p:{frequency:2},c:["gai1"]},{n:"ana1",x:624,y:258,p:{anabtn:0}}];
+  this.waddata = [{n:"destination",x:872,y:345,mode:0,ver:1,W:800,H:600},{n:"osc2",x:392,y:95,p:{type:"square"},c:["gai2"]},{n:"gai1",x:200,y:300,p:{gain:1000},c:["osc2.detune"]},{n:"osc1",x:49,y:150,p:{frequency:2},c:["gai1"]},{n:"ele1",x:128,y:455,p:{url:"samples/kerokeroshiyouyo.mp3"},c:["con1"]},{n:"con1",x:404,y:300,p:{buffer:"Five Columns Long.wav"},c:["destination","gai3"]},{n:"gai2",x:611,y:191,p:{gain:0.1},c:["destination"]},{n:"gai3",x:647,y:413,p:{gain:10},c:["destination"]}];
 
+  // (BufferSource) or (Convolver) is used. You should place 
+  // audio files to samples folder. * Note that the IR files are not MIT licensed.
+  // sampleurl object has the 'filename':'path to file' pairs.
+  this.sampleurl={
+    'Five Columns Long.wav':'samples/ir/IMreverbs1/Five Columns Long.wav',
+  };
+  function LoadBuffers(actx,list){
+    buf={'_count':Object.keys(list).length,'_ready':false};
+    for(name in list){
+      var o=buf[name]={};
+      o.req=new XMLHttpRequest();
+      o.req.open('GET',list[name],true);
+      o.req.responseType='arraybuffer';
+      o.req.buf=buf;
+      o.req.nam=name;
+      o.req.onload=function(){
+        if(this.response){
+          actx.decodeAudioData(this.response,
+            function(b){
+              this.buf[this.nam].data=b;
+              if(--this.buf._count==0)
+                this.buf._ready=true;
+            }.bind(this),
+            function(){}
+          );
+        }
+      };
+      o.req.onerror=function(){};
+      try{o.req.send();} catch(e){}
+    }
+    return buf;
+  }
   this.audioctx = audioctx;
   this.nodes = {};
   this.nodes.destination = destination;
@@ -30,21 +62,33 @@ function WebAudioEngine(audioctx,destination){
   }
   if(!destination)
     this.nodes.destination = this.audioctx.destination;
+  this.buffers = LoadBuffers(this.audioctx,this.sampleurl);
   this.build=function(){
     if((!this.buffers||this.buffers._ready)&&(this.strmsrc!='wait'))
       clearInterval(this.poll);
     else
       return;
     this.nodes.osc2 = this.audioctx.createOscillator();
+    this.nodes.osc2.type = "square";
     this.nodes.gai1 = this.audioctx.createGain();
     this.nodes.gai1.gain.value = 1000;
     this.nodes.osc1 = this.audioctx.createOscillator();
     this.nodes.osc1.frequency.value = 2;
-    this.nodes.ana1 = this.audioctx.createAnalyser();
-    this.nodes.osc2.connect(this.nodes.destination);
-    this.nodes.osc2.connect(this.nodes.ana1);
+    this.nodes.ele1 = this.audioctx.createMediaElementSource(document.getElementById("ele1"));
+    this.nodes.con1 = this.audioctx.createConvolver();
+    this.nodes.con1.buffer = this.buffers['Five Columns Long.wav'].data;
+    this.nodes.gai2 = this.audioctx.createGain();
+    this.nodes.gai2.gain.value = 0.1;
+    this.nodes.gai3 = this.audioctx.createGain();
+    this.nodes.gai3.gain.value = 10;
+    this.nodes.osc2.connect(this.nodes.gai2);
     this.nodes.gai1.connect(this.nodes.osc2.detune);
     this.nodes.osc1.connect(this.nodes.gai1);
+    this.nodes.ele1.connect(this.nodes.con1);
+    this.nodes.con1.connect(this.nodes.destination);
+    this.nodes.con1.connect(this.nodes.gai3);
+    this.nodes.gai2.connect(this.nodes.destination);
+    this.nodes.gai3.connect(this.nodes.destination);
   };
   this.rebuild=function(nn){
     function paramset(node,dat){
@@ -124,5 +168,6 @@ function WebAudioEngine(audioctx,destination){
 window.addEventListener('load',function(){audioengine=new WebAudioEngine()});
 </script>
 <div style="margin-top:100px"><button onclick="audioengine.rebuild();audioengine.start()">Play</button> <button onclick="audioengine.stop()">Stop</button><br/></div>
+<audio id="ele1" src="samples/kerokeroshiyouyo.mp3" controls></audio>
 </body>
 </html>

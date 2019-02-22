@@ -764,7 +764,7 @@ function ExportJs(wadobj){
 	for(var i=0;i<obj.length;++i){
 		var o=obj[i];
 		if(o.type=="ele"){
-			js+="<audio id=\""+o.n+"\" src=\""+o.params.url+"\" controls></audio>\n";
+			js+="<audio crossorigin='anonymous' id=\""+o.n+"\" src=\""+o.params.url+"\" controls></audio>\n";
 		}
 	}
 	js+="</body>\n</html>\n";
@@ -1625,6 +1625,7 @@ function ANode(parent,subtype,name,x,y,actx,dest){
 		this.audio=document.createElement("audio");
 		this.audio.setAttribute("class","audiopane");
 		this.audio.setAttribute("src","samples/kerokeroshiyouyo.mp3");
+    this.audio.setAttribute("crossorigin","anonymous");
 		this.audio.setAttribute("controls","true");
 		this.audio.setAttribute("style","position:absolute;top:63px;left:0px;width:230px");
 		this.elem.appendChild(this.audio);
